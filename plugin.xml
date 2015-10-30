@@ -42,10 +42,14 @@
 		
 	</platform>
 	<info>
-	 StreetHawk Feeds plugin depends on StreetHawk core plugin. 
+	 StreetHawk Beacon plugin depends on StreetHawk core plugin. 
 	 Install core plugin by using command
 	  
-	 cordova plugin add com.streethawk.plugin --variable APP_KEY=YOUR_APP_KEY --variable URL_SCHEME=YOUR_APP_SCHEME
+	 cordova plugin add streethawkanalytics --variable APP_KEY=APP_KEY --variable URL_SCHEME=SCHEME
+	
+	Note: In the above command replace 
+	APP_KEY with your application's app_key.
+	SCHEME with your application's deeplink scheme.
 	
 	</info>
 </plugin>
