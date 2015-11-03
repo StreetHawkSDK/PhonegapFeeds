@@ -22,6 +22,14 @@
                 <action android:name="com.streethawk.intent.action.APP_STATUS_NOTIFICATION" />
             </intent-filter>
         </receiver>
+ 		<receiver
+            android:name="com.streethawk.feeds.FeedWrapper"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.streethawk.intent.action.newfeed"/>
+            </intent-filter>
+        </receiver>
 		</config-file>   
 		
 		<config-file parent="/*" target="AndroidManifest.xml"/>
