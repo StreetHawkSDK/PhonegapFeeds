@@ -50,7 +50,7 @@
 		
 	</platform>
 	<info>
-	 StreetHawk Beacon plugin depends on StreetHawk core plugin. 
+	 StreetHawk Feeds plugin depends on StreetHawk core plugin. 
 	 Install core plugin by using command
 	  
 	 cordova plugin add streethawkanalytics --variable APP_KEY=APP_KEY --variable URL_SCHEME=SCHEME
