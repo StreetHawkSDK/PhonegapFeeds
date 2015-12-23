@@ -47,6 +47,8 @@
         <source-file src="src/ios/SDK/Feed/Publish/SHApp+Feed.m" />        
         <header-file src="src/ios/SDK/Feed/Publish/SHFeedObject.h" />
         <source-file src="src/ios/SDK/Feed/Publish/SHFeedObject.m" />
+        <header-file src="src/ios/SDK/Feed/Private/SHFeedBridge.h" />
+        <source-file src="src/ios/SDK/Feed/Private/SHFeedBridge.m" />
 		
 	</platform>
 	<info>

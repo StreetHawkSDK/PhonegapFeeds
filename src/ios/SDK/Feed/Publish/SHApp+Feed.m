@@ -18,7 +18,7 @@
 #import "SHApp+Feed.h"
 //header from StreetHawk
 #import "SHRequest.h" //for sending request
-#import "SHAppStatus.h" //for APPSTATUS_FEED_FETCH_TIME
+#import "SHFeedBridge.h" //for APPSTATUS_FEED_FETCH_TIME
 #import "SHUtils.h" //for streetHawkIsEnabled
 #import "SHLogger.h" //for sending logline
 //header from System
@@ -48,7 +48,7 @@
     {
         return;
     }
-    //update local cache time before send request, because this request has same format as others {app_status:..., code:0, value:...}, it will trigger `setFeedTimeStamp` again. If fail to get request, clear local cache time in callback handler, make next fetch happen.
+    //update local cache time before send request, because this request has same format as others {app_status:..., code:0, value:...}, it will trigger `setFeedTimestamp` again. If fail to get request, clear local cache time in callback handler, make next fetch happen.
     [[NSUserDefaults standardUserDefaults] setObject:@([[NSDate date] timeIntervalSinceReferenceDate]) forKey:APPSTATUS_FEED_FETCH_TIME];
     [[NSUserDefaults standardUserDefaults] synchronize];
     handler = [handler copy];
