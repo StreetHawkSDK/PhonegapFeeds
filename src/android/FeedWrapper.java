@@ -13,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import com.streethawk.library.core.StreetHawk;
+import android.app.Activity;
 
 /**
  * FeedWrapper receives feed item from server and passes the same to application.
