@@ -23,7 +23,7 @@ public class FeedWrapper extends BroadcastReceiver implements ISHFeedItemObserve
 	private CallbackContext mFeedItemCallback=null;
 	private static CallbackContext mNotifyNewFeedCallback=null;
 	private static Context mContext;
-	private FeedWrapper(){}
+	public FeedWrapper(){}
 
 	@Override
 	public void onReceive(Context context, Intent intent){
@@ -71,6 +71,18 @@ public class FeedWrapper extends BroadcastReceiver implements ISHFeedItemObserve
 		}
 	}
 
+//TODO
+	@Override
+	public void SHNotifyNewFeedItem(){
+		/*
+		if(null!=this.mFeedItemCallback){
+			PluginResult result = new PluginResult(PluginResult.Status.OK);
+			result.setKeepCallback(true);
+			this.mFeedItemCallback.sendPluginResult(result);
+		}
+		*/
+	}
+
 	@Override
 	public void shFeedReceived(JSONArray value){
 		if(null!=this.mFeedItemCallback){
@@ -80,4 +92,3 @@ public class FeedWrapper extends BroadcastReceiver implements ISHFeedItemObserve
 		}
 	}
 }
-

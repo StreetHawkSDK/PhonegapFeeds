@@ -1,65 +1,46 @@
-<?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.streethawk.feed" version="1.8.4" xmlns="http://apache.org/cordova/ns/plugins/1.0"
-	xmlns:android="http://schemas.android.com/apk/res/android">
-	<name>StreetHawkFeeds</name>
-	<description>StreetHawk SDK plugin for feed</description>
-    <license>Apache 2.0</license>
-    <keywords>push,messaging,deeplinking,referral,analytics,geofencing,beacons,marketing,automation,organic growth,feeds</keywords>
-	
+<?xml version="1.0" encoding="utf-8"?>
+<plugin id="com.streethawk.feed" version="1.8.4" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>
+		StreetHawkFeeds
+	</name>
+	<description>
+		StreetHawk SDK plugin for feed
+	</description>
+	<license>
+		Apache 2.0
+	</license>
+	<keywords>
+		push,messaging,deeplinking,referral,analytics,geofencing,beacons,marketing,automation,organic growth,feeds
+	</keywords>
 	<platform name="android">
 		<config-file parent="/*" target="res/xml/config.xml">
 			<feature name="feeds">
-				<param name="android-package" value="com.streethawk.feeds.feeds"/>
+				<param name="android-package" value="com.streethawk.feeds.feeds" />
 			</feature>
 		</config-file>
-		
-		<config-file parent="/manifest/application" target="AndroidManifest.xml">
-		 <receiver
-            android:name="com.streethawk.library.feeds.SHCoreModuleReceiver"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="com.streethawk.intent.action.APP_STATUS_NOTIFICATION" />
-            </intent-filter>
-        </receiver>
- 		<receiver
-            android:name="com.streethawk.feeds.FeedWrapper"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="com.streethawk.intent.action.newfeed"/>
-            </intent-filter>
-        </receiver>
-		</config-file>   
-		
-		<config-file parent="/*" target="AndroidManifest.xml"/>
-		<source-file src="src/android/FeedWrapper.java" target-dir="src/com/streethawk"/>
-		<source-file src="src/android/streethawkfeeds.jar" target-dir="libs/"/>
+		<framework src="com.streethawk.phonegap:feeds:1.8.5" />
+		<source-file src="src/android/FeedWrapper.java" target-dir="src/com/streethawk" />
 	</platform>
 	<platform name="ios">
-		
 		<!-- Enable preprocessor macro SH_FEATURE_FEED -->
 		<hook type="after_plugin_install" src="src/ios/Script/enable_feature.js" />
 		<hook type="before_plugin_uninstall" src="src/ios/Script/disable_feature.js" />
-               
-        <!-- Plugin native SDK -->
-        <header-file src="src/ios/SDK/Feed/Publish/SHApp+Feed.h" />
-        <source-file src="src/ios/SDK/Feed/Publish/SHApp+Feed.m" />        
-        <header-file src="src/ios/SDK/Feed/Publish/SHFeedObject.h" />
-        <source-file src="src/ios/SDK/Feed/Publish/SHFeedObject.m" />
-        <header-file src="src/ios/SDK/Feed/Private/SHFeedBridge.h" />
-        <source-file src="src/ios/SDK/Feed/Private/SHFeedBridge.m" />
-		
+		<!-- Plugin native SDK -->
+		<header-file src="src/ios/SDK/Feed/Publish/SHApp+Feed.h" />
+		<source-file src="src/ios/SDK/Feed/Publish/SHApp+Feed.m" />
+		<header-file src="src/ios/SDK/Feed/Publish/SHFeedObject.h" />
+		<source-file src="src/ios/SDK/Feed/Publish/SHFeedObject.m" />
+		<header-file src="src/ios/SDK/Feed/Private/SHFeedBridge.h" />
+		<source-file src="src/ios/SDK/Feed/Private/SHFeedBridge.m" />
 	</platform>
 	<info>
-	 StreetHawk Feeds plugin depends on StreetHawk core plugin. 
-	 Install core plugin by using command
-	  
-	 cordova plugin add streethawkanalytics --variable APP_KEY=APP_KEY --variable URL_SCHEME=SCHEME
-	
-	Note: In the above command replace 
-	APP_KEY with your application's app_key.
-	SCHEME with your application's deeplink scheme.
-	
+		StreetHawk Feeds plugin depends on StreetHawk core plugin.
+		Install core plugin by using command
+		
+		cordova plugin add streethawkanalytics --variable APP_KEY=APP_KEY --variable URL_SCHEME=SCHEME
+		
+		Note: In the above command replace
+		APP_KEY with your application's app_key.
+		SCHEME with your application's deeplink scheme.
 	</info>
 </plugin>
