@@ -58,61 +58,51 @@
         }
         return;
     }
-    //update local cache time before send request, because this request has same format as others {app_status:..., code:0, value:...}, it will trigger `setFeedTimestamp` again. If fail to get request, clear local cache time in callback handler, make next fetch happen.
-    BOOL needSet = NO;
-    NSObject *localTimeVal = [[NSUserDefaults standardUserDefaults] objectForKey:APPSTATUS_FEED_FETCH_TIME];
-    if (localTimeVal == nil || ![localTimeVal isKindOfClass:[NSNumber class]])
-    {
-        needSet = YES;
-    }
-    else
-    {
-        double localTime = [(NSNumber *)localTimeVal doubleValue];
-        if (localTime < [[NSDate date] timeIntervalSinceReferenceDate] + 60)
-        {
-            needSet = YES;
-        }
-    }
-    if (needSet)
-    {
-        [[NSUserDefaults standardUserDefaults] setObject:@([[NSDate date] timeIntervalSinceReferenceDate] + 60/*by testing server side is faster than client side time sometimes, add one minutes*/) forKey:APPSTATUS_FEED_FETCH_TIME];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+    //use v3 endpoint and it doesn't have app_status in v3 any more, so not update APPSTATUS_FEED_FETCH_TIME. 
     handler = [handler copy];
-    [[SHHTTPSessionManager sharedInstance] GET:@"/feed/" hostVersion:SHHostVersion_V1 parameters:@{@"offset": @(offset)} success:^(NSURLSessionDataTask * _Nullable task, id  _Nullable responseObject)
-    {
-        NSMutableArray *arrayFeeds = [NSMutableArray array];
-        NSError *error = nil;
-        NSAssert([responseObject isKindOfClass:[NSArray class]], @"Feed result should be array, got %@.", responseObject);
-        if ([responseObject isKindOfClass:[NSArray class]])
-        {
-            for (id obj in (NSArray *)responseObject)
-            {
-                NSAssert([obj isKindOfClass:[NSDictionary class]], @"Feed item should be dictionary, got %@.", obj);
-                if ([obj isKindOfClass:[NSDictionary class]])
-                {
-                    SHFeedObject *feedObj = [SHFeedObject createFromDictionary:(NSDictionary *)obj];
-                    [arrayFeeds addObject:feedObj];
-                }
-            }
-        }
-        else
-        {
-            error = [NSError errorWithDomain:SHErrorDomain code:INT_MIN userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Feed result should be array, got %@.", responseObject]}];
-        }
-        if (handler)
-        {
-            handler(arrayFeeds, error);
-        }
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nullable error)
-    {
-        [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:APPSTATUS_FEED_FETCH_TIME]; //make next fetch happen as this time fail.
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        if (handler)
-        {
-            handler(nil, error);
-        }
-    }];
+    [[SHHTTPSessionManager sharedInstance] GET:@"/feeds/"
+                                   hostVersion:SHHostVersion_V3
+                                    parameters:@{@"app_key": NONULL(StreetHawk.appKey),
+                                                 @"offset": @(offset)}
+                                       success:^(NSURLSessionDataTask * _Nullable task, id  _Nullable responseObject)
+     {
+         SHLog(@"Fetch feeds: %@.", responseObject);
+         NSDictionary *dictResponse = (NSDictionary *)responseObject;
+         NSAssert([dictResponse isKindOfClass:[NSDictionary class]],
+                  @"Feed response should be dictionary, got %@.", responseObject);
+         NSMutableArray *arrayFeeds = [NSMutableArray array];
+         NSError *error = nil;
+         NSAssert([dictResponse[@"results"] isKindOfClass:[NSArray class]],
+                  @"Feed result should be array, got %@.", dictResponse[@"results"]);
+         if ([dictResponse[@"results"] isKindOfClass:[NSArray class]])
+         {
+             for (id obj in (NSArray *)dictResponse[@"results"])
+             {
+                 NSAssert([obj isKindOfClass:[NSDictionary class]], @"Feed item should be dictionary, got %@.", obj);
+                 if ([obj isKindOfClass:[NSDictionary class]])
+                 {
+                     SHFeedObject *feedObj = [SHFeedObject createFromDictionary:(NSDictionary *)obj];
+                     [arrayFeeds addObject:feedObj];
+                 }
+             }
+         }
+         else
+         {
+             error = [NSError errorWithDomain:SHErrorDomain code:INT_MIN userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Feed result should be array, got %@.", responseObject]}];
+         }
+         if (handler)
+         {
+             handler(arrayFeeds, error);
+         }
+     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nullable error)
+     {
+         [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:APPSTATUS_FEED_FETCH_TIME]; //make next fetch happen as this time fail.
+         [[NSUserDefaults standardUserDefaults] synchronize];
+         if (handler)
+         {
+             handler(nil, error);
+         }
+     }];
 }
 
 - (void)sendFeedAck:(NSString *)feed_id
@@ -159,6 +149,10 @@
     dictResult[@"status"] = resultStr;
     dictResult[@"feed_delete"] = @(feedDelete);
     dictResult[@"complete"] = @(complete);
+    if (![stepId isKindOfClass:[NSString class]])
+    {
+        stepId = [NSString stringWithFormat:@"%@", stepId];
+    }
     if (!shStrIsEmpty(stepId))
     {
         dictResult[@"step_id"] = stepId;

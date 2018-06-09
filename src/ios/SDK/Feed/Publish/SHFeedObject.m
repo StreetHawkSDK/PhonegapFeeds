@@ -24,7 +24,19 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"feed id = %@, title = %@, message = %@, campaign = %@, content = %@, activate on %@, expires on %@, created on %@, modified on %@, deleted on %@", self.feed_id, self.title, self.message, self.campaign, self.content, shFormatStreetHawkDate(self.activates), shFormatStreetHawkDate(self.expires), shFormatStreetHawkDate(self.created), shFormatStreetHawkDate(self.modified), shFormatStreetHawkDate(self.deleted)];
+    return [NSString
+            stringWithFormat:
+            @"feed id = %@, title = %@, message = %@, campaign = %@, content = %@, activate on %@, expires on %@, created on %@, modified on %@, deleted on %@",
+            self.feed_id,
+            self.title,
+            self.message,
+            self.campaign,
+            self.content,
+            shFormatISODate(self.activates),
+            shFormatISODate(self.expires),
+            shFormatISODate(self.created),
+            shFormatISODate(self.modified),
+            shFormatISODate(self.deleted)];
 }
 
 + (SHFeedObject *)createFromDictionary:(NSDictionary *)dict
@@ -32,12 +44,12 @@
     SHFeedObject *obj = [[SHFeedObject alloc] init];
     obj.feed_id = [NSString stringWithFormat:@"%@", dict[@"id"]]; //server returns is int actually, make sure client use a string.
     NSObject *contentVal = dict[@"content"];
-    NSAssert(contentVal != nil && [contentVal isKindOfClass:[NSDictionary class]], @"content should be dictionary.");
+//    NSAssert(contentVal != nil && [contentVal isKindOfClass:[NSDictionary class]], @"content should be dictionary.");
     if (contentVal != nil && [contentVal isKindOfClass:[NSDictionary class]])
     {
         NSDictionary *contentDict = (NSDictionary *)contentVal;
         NSObject *apsVal = contentDict[@"aps"];
-        NSAssert(apsVal != nil && [apsVal isKindOfClass:[NSDictionary class]], @"aps should be dictionary.");
+        NSAssert(apsVal == nil/*tip feed created from dashboard will not have aps, as it doesn't save to campaign*/ || [apsVal isKindOfClass:[NSDictionary class]], @"aps should be dictionary.");
         if (apsVal != nil && [apsVal isKindOfClass:[NSDictionary class]])
         {
             NSDictionary *apsDict = (NSDictionary *)apsVal;
@@ -45,8 +57,8 @@
             int length = [contentDict[@"l"] intValue];
             if (length >= 0 && length <= alert.length)
             {
-                obj.title = [[alert substringToIndex:length] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-                obj.message = [[alert substringFromIndex:length] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                obj.title = [[alert substringToIndex:length] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                obj.message = [[alert substringFromIndex:length] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             }
         }
         NSObject *data = contentDict[@"d"];
@@ -57,7 +69,7 @@
         }
         else
         {
-            obj.content = data;
+            obj.content = @{@"value": [NSString stringWithFormat:@"%@", data]};
         }
     }
     obj.campaign = [NSString stringWithFormat:@"%@", dict[@"campaign"]];
@@ -69,6 +81,26 @@
     return obj;
 }
 
++ (SHFeedObject *)loadFromDictionary:(NSDictionary *)dict
+{
+    if (![dict isKindOfClass:[NSDictionary class]])
+    {
+        return nil;
+    }
+    SHFeedObject *obj = [[SHFeedObject alloc] init];
+    obj.feed_id = dict[@"feed_id"];
+    obj.title = dict[@"title"];
+    obj.message = dict[@"message"];
+    obj.campaign = dict[@"campaign"];
+    obj.content = dict[@"content"];
+    obj.activates = dict[@"activates"];
+    obj.expires = dict[@"expires"];
+    obj.created = dict[@"created"];
+    obj.modified = dict[@"modified"];
+    obj.deleted = dict[@"deleted"];
+    return obj;
+}
+
 - (NSDictionary *)serializeToDictionary
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -76,12 +108,15 @@
     dict[@"title"] = NONULL(self.title);
     dict[@"message"] = NONULL(self.message);
     dict[@"campaign"] = NONULL(self.campaign);
-    dict[@"content"] = self.content;
-    dict[@"activates"] = shFormatStreetHawkDate(self.activates);
-    dict[@"expires"] = shFormatStreetHawkDate(self.expires);
-    dict[@"created"] = shFormatStreetHawkDate(self.created);
-    dict[@"modified"] = shFormatStreetHawkDate(self.modified);
-    dict[@"deleted"] = shFormatStreetHawkDate(self.deleted);
+    if (self.content != nil)
+    {
+        dict[@"content"] = self.content;
+    }
+    dict[@"activates"] = shFormatISODate(self.activates);
+    dict[@"expires"] = shFormatISODate(self.expires);
+    dict[@"created"] = shFormatISODate(self.created);
+    dict[@"modified"] = shFormatISODate(self.modified);
+    dict[@"deleted"] = shFormatISODate(self.deleted);
     return dict;
 }
 
