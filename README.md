@@ -17,7 +17,7 @@ cordova plugin add streethawkanalytics  --variable APP_KEY=<YOUR_APPLICATIONS_AP
 Replace YOUR_APPLICATIONS_APP_KEY with app_key registered with StreetHawk for your application and URL_SCHEME_OF_APP with deeplinking scheme of your application.
 
 ## Documentation
-Click [here](https://streethawk.freshdesk.com/solution/articles/5000680134) for detailed documentation of StreetHawk's Feed plugin.
+Click [here](https://dashboard.streethawk.com/docs/sdks/phonegap/feed/) for detailed documentation of StreetHawk's Feed plugin.
 
 ## Other StreetHawk Plugins
 * [Growth](https://github.com/StreetHawkSDK/PhonegapGrowth) for Viral and organic growth
